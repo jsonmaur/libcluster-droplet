@@ -1,0 +1,101 @@
+[
+  {
+    "request": {
+      "method": "get",
+      "url": "http://169.254.169.254/metadata/v1/id"
+    },
+    "response": {
+      "status_code": ["HTTP/1.1", 200, "OK"],
+      "headers": {
+        "content-type": "text/plain; charset=utf-8"
+      },
+      "body": "123456789"
+    }
+  },
+  {
+    "request": {
+      "method": "get",
+      "url": "http://169.254.169.254/metadata/v1/error"
+    },
+    "response": {
+      "status_code": ["HTTP/1.1", 400, "Bad Request"]
+    }
+  },
+  {
+    "request": {
+      "method": "get",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer dop_v1_abc123"
+      },
+      "url": "https://api.digitalocean.com/v2/droplets?tag_name=foobar"
+    },
+    "response": {
+      "status_code": ["HTTP/1.1", 200, "OK"],
+      "headers": {
+        "content-type": "application/json; charset=utf-8"
+      },
+      "body": "{\"droplets\":[{\"id\":\"3164444\",\"name\":\"example\",\"status\":\"active\",\"networks\":{\"v4\":[{\"ip_address\":\"192.241.165.154\",\"type\":\"public\"}]}}]}\n"
+    }
+  },
+  {
+    "request": {
+      "method": "get",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer dop_v1_abc123"
+      },
+      "url": "https://api.digitalocean.com/v2/droplets?tag_name=error"
+    },
+    "response": {
+      "status_code": ["HTTP/1.1", 400, "Bad Request"]
+    }
+  },
+  {
+    "request": {
+      "method": "get",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer dop_v1_abc123"
+      },
+      "url": "https://api.digitalocean.com/v2/droplets"
+    },
+    "response": {
+      "status_code": ["HTTP/1.1", 200, "OK"],
+      "headers": {
+        "content-type": "application/json; charset=utf-8"
+      },
+      "body": "{\"droplets\":[{\"id\":\"3164444\",\"name\":\"example\",\"status\":\"active\",\"networks\":{\"v4\":[{\"ip_address\":\"10.128.192.124\",\"type\":\"private\"},{\"ip_address\":\"192.241.165.154\",\"type\":\"public\"}],\"v6\":[{\"ip_address\":\"2604:a880:0:1010::18a:a001\",\"type\":\"public\"}]}}],\"links\":{\"pages\":{\"next\":\"https://api.digitalocean.com/v2/droplets?page=2\"}}}\n"
+    }
+  },
+  {
+    "request": {
+      "method": "get",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer dop_v1_abc123"
+      },
+      "url": "https://api.digitalocean.com/v2/droplets?page=2"
+    },
+    "response": {
+      "status_code": ["HTTP/1.1", 200, "OK"],
+      "headers": {
+        "content-type": "application/json; charset=utf-8"
+      },
+      "body": "{\"droplets\":[{\"id\":\"3164459\",\"name\":\"example\",\"status\":\"active\",\"networks\":{\"v4\":[{\"ip_address\":\"10.128.192.138\",\"type\":\"private\"},{\"ip_address\":\"162.243.0.4\",\"type\":\"public\"}],\"v6\":[{\"ip_address\":\"2604:a880:0:1010::18a:a001\",\"type\":\"public\"}]}}],\"links\":{\"pages\":{}}}\n"
+    }
+  },
+  {
+    "request": {
+      "method": "get",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer dop_v1_abc123"
+      },
+      "url": "https://api.digitalocean.com/v2/droplets?page=3"
+    },
+    "response": {
+      "status_code": ["HTTP/1.1", 400, "Bad Request"]
+    }
+  }
+]
