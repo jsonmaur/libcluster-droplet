@@ -4,7 +4,7 @@
   <img alt="Test Status" src="https://img.shields.io/github/actions/workflow/status/jsonmaur/libcluster_droplet/test.yml?label=test&style=plastic">
 </a>
 
-<a href="https://hexdocs.pm/libcluster_droplet">
+<a href="https://hexdocs.pm/libcluster_droplet/">
   <img alt="Hex Version" src="https://img.shields.io/hexpm/v/libcluster_droplet?style=plastic" />
 </a>
 
