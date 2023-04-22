@@ -35,7 +35,7 @@ defmodule ClusterDroplet.MixProject do
 
   defp deps do
     [
-      {:certifi, "~> 2.11"},
+      {:certifi, "~> 2.0"},
       {:ex_doc, "~> 0.27", only: :dev, runtime: false},
       {:exvcr, "~> 0.11", only: :test, runtime: false},
       {:libcluster, "~> 3.0"}
