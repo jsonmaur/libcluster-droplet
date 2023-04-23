@@ -1,12 +1,4 @@
-# Libcluster Droplet Strategy
-
-<a href="https://github.com/jsonmaur/libcluster_droplet/actions/workflows/test.yml">
-  <img alt="Test Status" src="https://img.shields.io/github/actions/workflow/status/jsonmaur/libcluster_droplet/test.yml?label=test&style=plastic">
-</a>
-
-<a href="https://hexdocs.pm/libcluster_droplet/">
-  <img alt="Hex Version" src="https://img.shields.io/hexpm/v/libcluster_droplet?style=plastic" />
-</a>
+<a href="https://github.com/jsonmaur/libcluster-droplet/actions/workflows/test.yml"><img alt="Test Status" src="https://img.shields.io/github/actions/workflow/status/jsonmaur/libcluster-droplet/test.yml?label=&style=for-the-badge&logo=github"></a> <a href="https://www.npmjs.com/package/libcluster-droplet"><img alt="Hex Version" src="https://img.shields.io/hexpm/v/libcluster_droplet?style=for-the-badge&label=&logo=elixir" /></a>
 
 A Digital Ocean Droplet clustering strategy for [libcluster](https://github.com/bitwalker/libcluster). This strategy will connect all Droplets in your account to the cluster and can optionally be filtered by Droplet name or tag. It works by polling the Digital Ocean API, so a valid [access token](https://docs.digitalocean.com/reference/api/create-personal-access-token/) is required.
 
