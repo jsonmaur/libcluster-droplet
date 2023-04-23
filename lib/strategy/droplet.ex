@@ -146,10 +146,10 @@ defmodule Cluster.Strategy.Droplet do
   end
 
   @doc """
-  Converts a list of droplet maps to node names as explained in `to_node_name/2`.
+  Returns a list of node names as described in `to_node_name/2`.
 
   Will not return node names for droplets that don't have a status of "active", or that match the
-  provided ID.
+  provided ID of the current droplet.
   """
   def to_node_names(%State{} = state, droplets, id \\ nil) when is_list(droplets) do
     droplets

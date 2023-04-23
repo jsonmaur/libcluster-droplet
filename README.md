@@ -36,7 +36,7 @@ config :libcluster,
 ## Config
 
 | Key | Required | Description |
-| --- | -------- | ----------- |
+| --- | :------: | :---------- |
 | `:token` | ✓ | The Digital Ocean [access token](https://docs.digitalocean.com/reference/api/create-personal-access-token/) used for authenticating with the API. |
 | `:network` |  | Whether to use private or public IP addresses in the node name. Defaults to `:public`. |
 | `:ipv6` |  | Whether to use IPv6 addresses in the node name. Defaults to `false`. |
@@ -44,3 +44,56 @@ config :libcluster,
 | `:name` |  | Droplet name to filter by when adding to the cluster. Cannot be combined with `:tag_name`. |
 | `:node_basename` |  | The base name of the nodes you want to connect to. Defaults to the Droplet name. |
 | `:polling_interval` |  | Number of milliseconds between polls to the API. Defaults to `5_000`. |
+
+## Releases
+
+If you are using distributed Erlang and Mix releases, you'll need to set some environment variables in order for the clustering to work properly. This can be done in the `env.sh.eex` file generated when running `mix release.init`, or some other way of setting environment variables. Check out the [elixir docs](https://elixir-lang.org/getting-started/mix-otp/config-and-releases.html#operating-system-environment-configuration) and the [release docs](https://hexdocs.pm/mix/Mix.Tasks.Release.html#module-vm-args-and-env-sh-env-bat) for more info.
+
+You will need to set these three values:
+
+  * `RELEASE_DISTRIBUTION` - Set to `name` so the cluster works across nodes
+  * `RELEASE_NODE` - The full name of the current node (e.g. `app@127.0.0.1`)
+  * `RELEASE_COOKIE` - A type of "password" that allows nodes to connect to the cluster
+
+Here is an example `env.sh.eex` file that makes HTTP requests to the Droplet's metadata API to build the node name:
+
+```sh
+#!/bin/sh
+
+# Set this to "public" if you have `network: :public` in your strategy config
+NETWORK="private"
+
+# Set this to "ipv6" if you have `ipv6: true` in your strategy config
+IPV="ipv4"
+
+# Droplet hostname is only needed if `:node_basename` is not defined in your strategy config.
+# Otherwise, replace this with the value defined in `:node_basename`.
+HOSTNAME=$(curl -s http://169.254.169.254/metadata/v1/hostname)
+IP_ADDRESS=$(curl -s http://169.254.169.254/metadata/v1/interfaces/$NETWORK/0/$IPV/address)
+
+export RELEASE_DISTRIBUTION=name
+export RELEASE_NODE=$HOSTNAME@$IP_ADDRESS
+export RELEASE_COOKIE=some-secret-value
+```
+
+## Firewalls
+
+Erlang's [epmd](https://www.erlang.org/doc/man/epmd.html) communicates on port 4369, as well as a random port for each node in the cluster. If your Droplet has a firewall, you will need to add a rule to allow all incoming TCP traffic from other Droplets in the cluster. This can be done dynamically using a tag if you're using a [Cloud Firewall](https://docs.digitalocean.com/products/networking/firewalls/).
+
+If you want to tighten security even further and only allow specific ports, you can customize the ports used by epmd by adding this to your `env.sh.eex` file:
+
+```sh
+#
+ERL_EPMD_PORT=9000
+ERL_NODE_PORT=9001
+
+case $RELEASE_COMMAND in
+  start*|daemon*)
+    export ELIXIR_ERL_OPTIONS="-kernel inet_dist_listen_min $ERL_NODE_PORT inet_dist_listen_max $ERL_NODE_PORT"
+    ;;
+  *)
+    ;;
+esac
+```
+
+*Note that if you use a single node port, you can only run one app instance in each Droplet.*
