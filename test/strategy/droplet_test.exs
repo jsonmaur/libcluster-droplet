@@ -230,6 +230,38 @@ defmodule Cluster.Strategy.DropletTest do
                refute Droplet.to_node_name(%State{}, %{"id" => 1, "networks" => %{}})
              end) =~ "No private ipv4 network was found for droplet #1"
     end
+
+    test "should return name for droplet with passing health check" do
+      state = %State{config: [node_basename: "yo", health_check: {:tcp, port: 80}]}
+      droplet = %{"networks" => %{"v4" => [%{"type" => "private", "ip_address" => "1.1.1.1"}]}}
+
+      assert Droplet.to_node_name(state, droplet) == :"yo@1.1.1.1"
+    end
+
+    test "should not return name for droplet with failing health check" do
+      state = %State{config: [node_basename: "yo", health_check: {:tcp, port: 80, timeout: 100}]}
+      droplet = %{"networks" => %{"v4" => [%{"type" => "private", "ip_address" => "2.2.2.2"}]}}
+
+      refute Droplet.to_node_name(state, droplet)
+    end
+  end
+
+  describe "healthy?/2" do
+    test "should return true if no health check is provided" do
+      assert Droplet.healthy?("localhost", nil)
+    end
+
+    test "should return true if health check passes" do
+      assert Droplet.healthy?("hex.pm", {:tcp, port: 80})
+    end
+
+    test "should return false if health check times out" do
+      refute Droplet.healthy?("hex.pm", {:tcp, port: 80, timeout: 1})
+    end
+
+    test "should return false if health check fails" do
+      refute Droplet.healthy?("hex.pm", {:tcp, port: 9999, timeout: 100})
+    end
   end
 
   def list_nodes(nodes), do: nodes

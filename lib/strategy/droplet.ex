@@ -162,13 +162,15 @@ defmodule Cluster.Strategy.Droplet do
   Converts a droplet map returned from the Digital Ocean API to a node name such as
   `:"foobar@127.0.0.1"`.
 
-  Logs a warning and returns nil if the droplet doesn't have an address for the defined network
-  type and ip version.
+  Will optionally run a health check on the node to ensure it is ready to connect to the cluster.
+  Returns nil if the health check fails, or if the droplet doesn't have an address for the defined
+  network type and ip version.
   """
   def to_node_name(%State{} = state, droplet) when is_map(droplet) do
     basename = Keyword.get(state.config, :node_basename, Map.get(droplet, "name"))
     type = Keyword.get(state.config, :network, :private)
     ipv = if Keyword.get(state.config, :ipv6, false), do: "v6", else: "v4"
+    health_check = Keyword.get(state.config, :health_check)
 
     network =
       droplet
@@ -178,7 +180,11 @@ defmodule Cluster.Strategy.Droplet do
 
     case network do
       %{"ip_address" => ip_address} ->
-        :"#{basename}@#{ip_address}"
+        if healthy?(ip_address, health_check) do
+          :"#{basename}@#{ip_address}"
+        else
+          nil
+        end
 
       _ ->
         Logger.warn(
@@ -187,6 +193,23 @@ defmodule Cluster.Strategy.Droplet do
         )
 
         nil
+    end
+  end
+
+  @doc """
+  Runs a health check for the provided IP address.
+  """
+  def healthy?(_ip, nil), do: true
+
+  def healthy?(ip, {:tcp, opts}) do
+    port = Keyword.fetch!(opts, :port)
+    timeout = Keyword.get(opts, :timeout, 500)
+
+    with {:ok, socket} <- :gen_tcp.connect(to_charlist(ip), port, [], timeout),
+         :ok <- :gen_tcp.close(socket) do
+      true
+    else
+      _ -> false
     end
   end
 end

@@ -27,13 +27,14 @@ config :libcluster,
       strategy: Cluster.Strategy.Droplet,
       config: [
         token: System.fetch_env!("DIGITALOCEAN_TOKEN"),
+        health_check: {:tcp, port: 80},
         tag_name: "foobar"
       ]
     ]
   ]
 ```
 
-## Config
+### Config
 
 | Key | Required | Description |
 | --- | :------: | :---------- |
@@ -43,7 +44,15 @@ config :libcluster,
 | `:tag_name` |  | Droplet tag to filter by when adding to the cluster. Cannot be combined with `:name`. |
 | `:name` |  | Droplet name to filter by when adding to the cluster. Cannot be combined with `:tag_name`. |
 | `:node_basename` |  | The base name of the nodes you want to connect to. Defaults to the Droplet name. |
+| `:health_check` |  | Whether to run [health checks](#health-checks) against the nodes before adding them to the cluster. |
 | `:polling_interval` |  | Number of milliseconds between polls to the API. Defaults to `5_000`. |
+
+### Health Checks
+
+When optionally defined in the config, nodes will not be added to the cluster until they are reported as healthy. `:health_check` should be a tuple with the first element being the health check type, and the second element being a keyword list of options. Currently the only supported type is `:tcp` with the following options:
+
+* `:port` - The port to run the health check on. Value is required.
+* `:timeout` - Number of milliseconds to wait before the node is considered unhealthy. Defaults to `500`.
 
 ## Releases
 
