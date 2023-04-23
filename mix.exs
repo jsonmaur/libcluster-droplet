@@ -14,7 +14,7 @@ defmodule ClusterDroplet.MixProject do
       aliases: aliases(),
       source_url: @url,
       homepage_url: "#{@url}#readme",
-      description: "Digital Ocean Droplet strategy for libcluster",
+      description: "Libcluster strategy for Digital Ocean Droplets",
       authors: ["Jason Maurer"],
       package: [
         licenses: ["MIT"],

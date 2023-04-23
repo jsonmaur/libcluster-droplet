@@ -37,7 +37,7 @@ config :libcluster,
 ### Config
 
 | Key | Required | Description |
-| --- | :------: | :---------- |
+| :-- | :------: | :---------- |
 | `:token` | ✓ | The Digital Ocean [access token](https://docs.digitalocean.com/reference/api/create-personal-access-token/) used for authenticating with the API. |
 | `:network` |  | Whether to use private or public IP addresses in the node name. Defaults to `:private`. |
 | `:ipv6` |  | Whether to use IPv6 addresses in the node name. Defaults to `false`. |
@@ -98,11 +98,11 @@ ERL_EPMD_PORT=9000
 
 # This port will be used by epmd instead of a random port for each node.
 # Note that if you set this value, you can only run one app instance in each Droplet.
-NODE_PORT=9001
+ERL_NODE_PORT=9001
 
 case $RELEASE_COMMAND in
   start*|daemon*)
-    export ELIXIR_ERL_OPTIONS="-kernel inet_dist_listen_min $NODE_PORT inet_dist_listen_max $NODE_PORT"
+    export ELIXIR_ERL_OPTIONS="-kernel inet_dist_listen_min $ERL_NODE_PORT inet_dist_listen_max $ERL_NODE_PORT"
     ;;
   *)
     ;;

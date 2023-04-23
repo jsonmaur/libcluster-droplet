@@ -1,7 +1,5 @@
 defmodule Cluster.Strategy.Droplet do
-  @moduledoc """
-  Digital Ocean Droplet strategy for libcluster
-  """
+  @moduledoc false
 
   use GenServer
   use Cluster.Strategy
