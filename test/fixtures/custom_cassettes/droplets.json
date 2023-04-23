@@ -35,7 +35,7 @@
       "headers": {
         "content-type": "application/json; charset=utf-8"
       },
-      "body": "{\"droplets\":[{\"id\":\"3164444\",\"name\":\"example\",\"status\":\"active\",\"networks\":{\"v4\":[{\"ip_address\":\"192.241.165.154\",\"type\":\"public\"}]}}]}\n"
+      "body": "{\"droplets\":[{\"id\":\"3164444\",\"name\":\"example\",\"status\":\"active\",\"networks\":{\"v4\":[{\"ip_address\":\"10.128.192.124\",\"type\":\"private\"}]}}]}\n"
     }
   },
   {

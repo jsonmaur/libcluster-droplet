@@ -67,8 +67,9 @@ NETWORK="private"
 IPV="ipv4"
 
 # Droplet hostname is only needed if `:node_basename` is not defined in your strategy config.
-# Otherwise, replace this with the value defined in `:node_basename`.
+# Otherwise, replace this curl command with the value defined in `:node_basename`.
 HOSTNAME=$(curl -s http://169.254.169.254/metadata/v1/hostname)
+
 IP_ADDRESS=$(curl -s http://169.254.169.254/metadata/v1/interfaces/$NETWORK/0/$IPV/address)
 
 export RELEASE_DISTRIBUTION=name
@@ -83,17 +84,18 @@ Erlang's [epmd](https://www.erlang.org/doc/man/epmd.html) communicates on port 4
 If you want to tighten security even further and only allow specific ports, you can customize the ports used by epmd by adding this to your `env.sh.eex` file:
 
 ```sh
-#
+# This port will be used by epmd instead of port 4369.
 ERL_EPMD_PORT=9000
-ERL_NODE_PORT=9001
+
+# This port will be used by epmd instead of a random port for each node.
+# Note that if you set this value, you can only run one app instance in each Droplet.
+NODE_PORT=9001
 
 case $RELEASE_COMMAND in
   start*|daemon*)
-    export ELIXIR_ERL_OPTIONS="-kernel inet_dist_listen_min $ERL_NODE_PORT inet_dist_listen_max $ERL_NODE_PORT"
+    export ELIXIR_ERL_OPTIONS="-kernel inet_dist_listen_min $NODE_PORT inet_dist_listen_max $NODE_PORT"
     ;;
   *)
     ;;
 esac
 ```
-
-*Note that if you use a single node port, you can only run one app instance in each Droplet.*

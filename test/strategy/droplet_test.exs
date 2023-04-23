@@ -35,13 +35,23 @@ defmodule Cluster.Strategy.DropletTest do
         "id" => 2,
         "name" => "foobar",
         "status" => "off",
-        "networks" => %{"v4" => [%{"type" => "public", "ip_address" => "2.2.2.2"}]}
+        "networks" => %{
+          "v4" => [
+            %{"type" => "public", "ip_address" => "2.2.2.2"},
+            %{"type" => "private", "ip_address" => "127.0.0.2"}
+          ]
+        }
       },
       %{
         "id" => 3,
         "name" => "foobar",
         "status" => "active",
-        "networks" => %{"v4" => [%{"type" => "public", "ip_address" => "3.3.3.3"}]}
+        "networks" => %{
+          "v4" => [
+            %{"type" => "public", "ip_address" => "3.3.3.3"},
+            %{"type" => "private", "ip_address" => "127.0.0.3"}
+          ]
+        }
       }
     ]
 
@@ -58,8 +68,7 @@ defmodule Cluster.Strategy.DropletTest do
         config: [
           polling_interval: 100,
           token: "dop_v1_abc123",
-          tag_name: "foobar",
-          network: :public
+          tag_name: "foobar"
         ]
       }
 
@@ -71,12 +80,12 @@ defmodule Cluster.Strategy.DropletTest do
         capture_log(fn -> Droplet.start_link([ctx.state]) end)
       end
 
-      assert_receive {:connect, :"example@192.241.165.154"}, 100
+      assert_receive {:connect, :"example@10.128.192.124"}, 100
     end
 
     test "should remove nodes", ctx do
       use_cassette "droplets", custom: true do
-        nodes = [:"example@192.241.165.154", :"example@1.2.3.4"]
+        nodes = [:"example@1.2.3.4", :"example@10.128.192.124"]
         state = Map.put(ctx.state, :meta, MapSet.new(nodes))
         state = Map.put(state, :list_nodes, {__MODULE__, :list_nodes, [nodes]})
 
@@ -84,12 +93,12 @@ defmodule Cluster.Strategy.DropletTest do
       end
 
       assert_receive {:disconnect, :"example@1.2.3.4"}, 100
-      refute_receive {:connect, :"example@192.241.165.154"}, 100
+      refute_receive {:connect, :"example@10.128.192.124"}, 100
     end
 
     test "should not do anything if nodes have not changed", ctx do
       use_cassette "droplets", custom: true do
-        nodes = [:"example@192.241.165.154"]
+        nodes = [:"example@10.128.192.124"]
         state = Map.put(ctx.state, :meta, MapSet.new(nodes))
         state = Map.put(state, :list_nodes, {__MODULE__, :list_nodes, [nodes]})
 
@@ -134,8 +143,8 @@ defmodule Cluster.Strategy.DropletTest do
 
       use_cassette "droplets", custom: true, match_requests_on: [:query], custom_matchers: [auth] do
         assert Droplet.get_nodes(%State{}, "https://api.digitalocean.com/v2/droplets", "dop_v1_abc123", nil) == [
-                 :"example@192.241.165.154",
-                 :"example@162.243.0.4"
+                 :"example@10.128.192.124",
+                 :"example@10.128.192.138"
                ]
       end
     end
@@ -143,7 +152,7 @@ defmodule Cluster.Strategy.DropletTest do
     test "should not return self in list of nodes" do
       use_cassette "droplets", custom: true, match_requests_on: [:query] do
         assert Droplet.get_nodes(%State{}, "https://api.digitalocean.com/v2/droplets", "dop_v1_abc123", "3164444") == [
-                 :"example@162.243.0.4"
+                 :"example@10.128.192.138"
                ]
       end
     end
@@ -174,19 +183,19 @@ defmodule Cluster.Strategy.DropletTest do
 
   describe "to_node_names/3" do
     test "should return list of names", ctx do
-      assert Droplet.to_node_names(%State{}, ctx.droplets) == [:"foobar@1.1.1.1", :"foobar@3.3.3.3"]
+      assert Droplet.to_node_names(%State{}, ctx.droplets) == [:"foobar@127.0.0.1", :"foobar@127.0.0.3"]
     end
 
     test "should return list of names without self", ctx do
-      assert Droplet.to_node_names(%State{}, ctx.droplets, 1) == [:"foobar@3.3.3.3"]
+      assert Droplet.to_node_names(%State{}, ctx.droplets, 1) == [:"foobar@127.0.0.3"]
     end
 
     test "should not return name for droplet with no ip address", ctx do
       droplets = ctx.droplets ++ [%{"id" => 4, "name" => "foobar", "status" => "active", "networks" => %{}}]
 
       assert capture_log(fn ->
-               assert Droplet.to_node_names(%State{}, droplets) == [:"foobar@1.1.1.1", :"foobar@3.3.3.3"]
-             end) =~ "No public ipv4 network was found for droplet #4"
+               assert Droplet.to_node_names(%State{}, droplets) == [:"foobar@127.0.0.1", :"foobar@127.0.0.3"]
+             end) =~ "No private ipv4 network was found for droplet #4"
     end
   end
 
@@ -195,30 +204,31 @@ defmodule Cluster.Strategy.DropletTest do
       %{droplet: Enum.at(ctx.droplets, 0)}
     end
 
-    test "should return name from ipv4 public address", ctx do
-      assert Droplet.to_node_name(%State{}, ctx.droplet) == :"foobar@1.1.1.1"
-    end
-
     test "should return name from ipv4 private address", ctx do
-      assert Droplet.to_node_name(%State{config: [network: :private]}, ctx.droplet) == :"foobar@127.0.0.1"
+      assert Droplet.to_node_name(%State{}, ctx.droplet) == :"foobar@127.0.0.1"
     end
 
-    test "should return name from ipv6 public address", ctx do
-      assert Droplet.to_node_name(%State{config: [ipv6: true]}, ctx.droplet) == :"foobar@2606:4700:4700::1111"
+    test "should return name from ipv4 public address", ctx do
+      assert Droplet.to_node_name(%State{config: [network: :public]}, ctx.droplet) == :"foobar@1.1.1.1"
     end
 
     test "should return name from ipv6 private address", ctx do
-      assert Droplet.to_node_name(%State{config: [ipv6: true, network: :private]}, ctx.droplet) == :"foobar@::1"
+      assert Droplet.to_node_name(%State{config: [ipv6: true]}, ctx.droplet) == :"foobar@::1"
+    end
+
+    test "should return name from ipv6 public address", ctx do
+      assert Droplet.to_node_name(%State{config: [ipv6: true, network: :public]}, ctx.droplet) ==
+               :"foobar@2606:4700:4700::1111"
     end
 
     test "should return name with a base name", ctx do
-      assert Droplet.to_node_name(%State{config: [node_basename: "yo"]}, ctx.droplet) == :"yo@1.1.1.1"
+      assert Droplet.to_node_name(%State{config: [node_basename: "yo"]}, ctx.droplet) == :"yo@127.0.0.1"
     end
 
     test "should not return name for droplet with no ip address" do
       assert capture_log(fn ->
                refute Droplet.to_node_name(%State{}, %{"id" => 1, "networks" => %{}})
-             end) =~ "No public ipv4 network was found for droplet #1"
+             end) =~ "No private ipv4 network was found for droplet #1"
     end
   end
 
