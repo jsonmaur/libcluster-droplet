@@ -38,7 +38,7 @@ config :libcluster,
 | Key | Required | Description |
 | --- | :------: | :---------- |
 | `:token` | ✓ | The Digital Ocean [access token](https://docs.digitalocean.com/reference/api/create-personal-access-token/) used for authenticating with the API. |
-| `:network` |  | Whether to use private or public IP addresses in the node name. Defaults to `:public`. |
+| `:network` |  | Whether to use private or public IP addresses in the node name. Defaults to `:private`. |
 | `:ipv6` |  | Whether to use IPv6 addresses in the node name. Defaults to `false`. |
 | `:tag_name` |  | Droplet tag to filter by when adding to the cluster. Cannot be combined with `:name`. |
 | `:name` |  | Droplet name to filter by when adding to the cluster. Cannot be combined with `:tag_name`. |

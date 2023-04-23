@@ -167,7 +167,7 @@ defmodule Cluster.Strategy.Droplet do
   """
   def to_node_name(%State{} = state, droplet) when is_map(droplet) do
     basename = Keyword.get(state.config, :node_basename, Map.get(droplet, "name"))
-    type = Keyword.get(state.config, :network, :public)
+    type = Keyword.get(state.config, :network, :private)
     ipv = if Keyword.get(state.config, :ipv6, false), do: "v6", else: "v4"
 
     network =

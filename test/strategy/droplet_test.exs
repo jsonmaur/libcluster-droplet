@@ -58,7 +58,8 @@ defmodule Cluster.Strategy.DropletTest do
         config: [
           polling_interval: 100,
           token: "dop_v1_abc123",
-          tag_name: "foobar"
+          tag_name: "foobar",
+          network: :public
         ]
       }
 
