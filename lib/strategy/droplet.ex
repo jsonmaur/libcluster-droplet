@@ -1,5 +1,7 @@
 defmodule Cluster.Strategy.Droplet do
-  @moduledoc false
+  @moduledoc """
+  A libcluster strategy for Digital Ocean Droplets
+  """
 
   use GenServer
   use Cluster.Strategy
@@ -100,7 +102,7 @@ defmodule Cluster.Strategy.Droplet do
   """
   def get_nodes(%State{} = state, url, token, id) do
     headers = [
-      {to_charlist("Content-Type"), to_charlist("application/json")},
+      {to_charlist("Accept"), to_charlist("application/json")},
       {to_charlist("Authorization"), to_charlist("Bearer #{token}")}
     ]
 

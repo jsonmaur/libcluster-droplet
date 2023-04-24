@@ -1,7 +1,7 @@
 defmodule ClusterDroplet.MixProject do
   use Mix.Project
 
-  @url "https://github.com/jsonmaur/libcluster_droplet"
+  @url "https://github.com/jsonmaur/libcluster-droplet"
 
   def project do
     [
@@ -14,7 +14,7 @@ defmodule ClusterDroplet.MixProject do
       aliases: aliases(),
       source_url: @url,
       homepage_url: "#{@url}#readme",
-      description: "Libcluster strategy for Digital Ocean Droplets",
+      description: "A libcluster strategy for Digital Ocean Droplets",
       authors: ["Jason Maurer"],
       package: [
         licenses: ["MIT"],
