@@ -7,11 +7,6 @@ defmodule Cluster.Strategy.DropletTest do
   alias Cluster.Strategy.Droplet
   alias Cluster.Strategy.State
 
-  setup_all do
-    :inets.start()
-    :ok
-  end
-
   setup do
     ExVCR.Config.cassette_library_dir("test/fixtures/vcr_cassettes", "test/fixtures/custom_cassettes")
 

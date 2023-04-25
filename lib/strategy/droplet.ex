@@ -27,9 +27,6 @@ defmodule Cluster.Strategy.Droplet do
   goes down.
   """
   def start_link(opts) do
-    Application.ensure_all_started(:inets)
-    Application.ensure_all_started(:ssl)
-
     GenServer.start_link(__MODULE__, opts)
   end
 
@@ -106,16 +103,7 @@ defmodule Cluster.Strategy.Droplet do
       {to_charlist("Authorization"), to_charlist("Bearer #{token}")}
     ]
 
-    ssl = [
-      verify: :verify_peer,
-      depth: 99,
-      cacerts: :certifi.cacerts(),
-      customize_hostname_check: [
-        match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
-      ]
-    ]
-
-    case :httpc.request(:get, {to_charlist(url), headers}, [ssl: ssl], []) do
+    case :httpc.request(:get, {to_charlist(url), headers}, [ssl: ssl_opts()], []) do
       {:ok, {{_, 200, _}, _, body}} ->
         body = Jason.decode!(body)
         droplets = Map.get(body, "droplets", [])
@@ -211,5 +199,16 @@ defmodule Cluster.Strategy.Droplet do
     else
       _ -> false
     end
+  end
+
+  defp ssl_opts do
+    [
+      depth: 99,
+      verify: :verify_peer,
+      cacerts: :certifi.cacerts(),
+      customize_hostname_check: [
+        match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+      ]
+    ]
   end
 end
