@@ -1,8 +1,14 @@
-<a href="https://github.com/jsonmaur/libcluster-droplet/actions/workflows/test.yml"><img alt="Test Status" src="https://img.shields.io/github/actions/workflow/status/jsonmaur/libcluster-droplet/test.yml?label=&style=for-the-badge&logo=github"></a> <a href="https://hexdocs.pm/libcluster_droplet/"><img alt="Hex Version" src="https://img.shields.io/hexpm/v/libcluster_droplet?style=for-the-badge&label=&logo=elixir" /></a>
+# Libcluster Droplet
 
 A [libcluster](https://github.com/bitwalker/libcluster) strategy for Digital Ocean Droplets. This clustering strategy will connect all Droplets in your account to the cluster and can optionally be filtered by Droplet name or tag. It works by polling the Digital Ocean API, so a valid [access token](https://docs.digitalocean.com/reference/api/create-personal-access-token/) is required.
 
-## Getting Started
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Health Checks](#health-checks)
+- [Releases](#releases)
+- [Firewalls](#firewalls)
+
+## Installation
 
 ```elixir
 def deps do
@@ -26,7 +32,7 @@ config :libcluster,
   ]
 ```
 
-### Config
+## Configuration
 
 | Key | Required | Description |
 | :-- | :------: | :---------- |
@@ -39,7 +45,7 @@ config :libcluster,
 | `:health_check` |  | Whether to run [health checks](#health-checks) against the nodes before adding them to the cluster. |
 | `:polling_interval` |  | Number of milliseconds between polls to the API. Defaults to `5_000`. |
 
-### Health Checks
+## Health Checks
 
 When optionally defined in the config, nodes will not be added to the cluster until they are reported as healthy. `:health_check` should be a tuple with the first element being the health check type, and the second element being a keyword list of options. Currently the only supported type is `:tcp` with the following options:
 

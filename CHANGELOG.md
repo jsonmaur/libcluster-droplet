@@ -1,3 +1,9 @@
+## v1.1.1
+
+- Update documentation and metadata
+- Start required applications in mix.exs
+- Fix http content-type header
+
 ## v1.1.0
 
 - Added health checks config option

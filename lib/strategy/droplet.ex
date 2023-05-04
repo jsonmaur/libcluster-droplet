@@ -1,6 +1,7 @@
 defmodule Cluster.Strategy.Droplet do
   @moduledoc """
-  A libcluster strategy for Digital Ocean Droplets
+  A libcluster strategy for Digital Ocean Droplets. Check out the [README](readme.html) to get
+  started.
   """
 
   use GenServer

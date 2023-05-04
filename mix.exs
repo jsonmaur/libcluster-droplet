@@ -6,7 +6,7 @@ defmodule ClusterDroplet.MixProject do
   def project do
     [
       app: :libcluster_droplet,
-      version: "1.1.0",
+      version: "1.1.1",
       elixir: "~> 1.13",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
@@ -15,14 +15,14 @@ defmodule ClusterDroplet.MixProject do
       source_url: @url,
       homepage_url: "#{@url}#readme",
       description: "A libcluster strategy for Digital Ocean Droplets",
-      authors: ["Jason Maurer"],
       package: [
         licenses: ["MIT"],
         links: %{"GitHub" => @url}
       ],
       docs: [
         main: "readme",
-        extras: ["README.md"]
+        extras: ["README.md"],
+        authors: ["Jason Maurer"]
       ]
     ]
   end
